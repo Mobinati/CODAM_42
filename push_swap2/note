@@ -1,0 +1,6 @@
+
+
+
+ARG=$(seq 1 4500 | shuf | tr '\n' ' ')
+./push_swap $ARG | wc -l
+
