@@ -116,6 +116,156 @@ static void	sort_small(t_stack **a, t_stack **b, int size)
 		pa(a, b);
 }
 
+static double	disorder_ratio(t_stack *stack, int size)
+{
+	int	inversions;
+
+	inversions = 0;
+	while (stack && stack->next)
+	{
+		if (stack->index > stack->next->index)
+			inversions++;
+		stack = stack->next;
+	}
+	return ((double)inversions / (double)size);
+}
+
+static int	index_position(t_stack *stack, long index)
+{
+	int	pos;
+
+	pos = 0;
+	while (stack)
+	{
+		if (stack->index == index)
+			return (pos);
+		pos++;
+		stack = stack->next;
+	}
+	return (-1);
+}
+
+static int	min_index(t_stack *stack)
+{
+	long	min;
+
+	min = stack->index;
+	while (stack)
+	{
+		if (stack->index < min)
+			min = stack->index;
+		stack = stack->next;
+	}
+	return ((int)min);
+}
+
+static int	max_index(t_stack *stack)
+{
+	long	max;
+
+	max = stack->index;
+	while (stack)
+	{
+		if (stack->index > max)
+			max = stack->index;
+		stack = stack->next;
+	}
+	return ((int)max);
+}
+
+static void	rotate_index_to_top(t_stack **stack, long index, char name)
+{
+	int	pos;
+	int	size;
+
+	pos = index_position(*stack, index);
+	size = stack_size(*stack);
+	if (pos <= size / 2)
+	{
+		while (pos-- > 0)
+		{
+			if (name == 'a')
+				ra(stack);
+			else
+				rb(stack);
+		}
+	}
+	else
+	{
+		while (pos++ < size)
+		{
+			if (name == 'a')
+				rra(stack);
+			else
+				rrb(stack);
+		}
+	}
+}
+
+void	sort_selection(t_stack **a, t_stack **b)
+{
+	while (*a)
+	{
+		rotate_index_to_top(a, min_index(*a), 'a');
+		pb(a, b);
+	}
+	while (*b)
+		pa(a, b);
+}
+
+static int	sort_window(int size)
+{
+	if (size <= 100)
+		return (15);
+	return (30);
+}
+
+static void	push_window_to_b(t_stack **a, t_stack **b, int size)
+{
+	int	pushed;
+	int	window;
+
+	pushed = 0;
+	window = sort_window(size);
+	while (*a)
+	{
+		if ((*a)->index <= pushed)
+		{
+			pb(a, b);
+			pushed++;
+			if (*a && (*a)->index > pushed + window)
+				rr(a, b);
+			else
+				rb(b);
+		}
+		else if ((*a)->index <= pushed + window)
+		{
+			pb(a, b);
+			pushed++;
+		}
+		else
+			ra(a);
+	}
+}
+
+static void	rebuild_a_from_b(t_stack **a, t_stack **b)
+{
+	while (*b)
+	{
+		rotate_index_to_top(b, max_index(*b), 'b');
+		pa(a, b);
+	}
+}
+
+void	sort_chunks(t_stack **a, t_stack **b)
+{
+	int	size;
+
+	size = stack_size(*a);
+	push_window_to_b(a, b, size);
+	rebuild_a_from_b(a, b);
+}
+
 static void	sort_radix(t_stack **a, t_stack **b)
 {
 	int	size;
@@ -144,15 +294,29 @@ static void	sort_radix(t_stack **a, t_stack **b)
 	}
 }
 
-void	sort_stack(t_stack **a, t_stack **b)
+void	sort_adaptive(t_stack **a, t_stack **b)
 {
-	int	size;
+	int		size;
+	double	disorder;
 
 	size = stack_size(*a);
 	if (size <= 1 || is_sorted(*a))
 		return ;
 	if (size <= 5)
+	{
 		sort_small(a, b, size);
+		return ;
+	}
+	disorder = disorder_ratio(*a, size);
+	if (disorder < 0.2 || size <= 50)
+		sort_selection(a, b);
+	else if (size <= 500)
+		sort_chunks(a, b);
 	else
 		sort_radix(a, b);
+}
+
+void	sort_stack(t_stack **a, t_stack **b)
+{
+	sort_adaptive(a, b);
 }

@@ -26,9 +26,7 @@ int	main(int	argc, char	**argv)
 	if (!is_sorted(a))
 	{
 		assign_indexes(a);
-		print_stack(a);  // before
 		sort_stack(&a, &b);
-		print_stack(a);  // after
 	}
 	free_stack(&a);
 	free_stack(&b);
