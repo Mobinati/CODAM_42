@@ -9,19 +9,13 @@ class DataProcessor(ABC):
         self.data: list[tuple[int, str]] = []
         self.rank: int = 0
 
-
     @abstractmethod
     def validate(self, data: Any) -> bool:
         pass
 
-
     @abstractmethod
     def ingest(self, data: Any) -> None:
-        try:
-            validate(data)
-        
-        except Exception as e:
-            print(f"Error: {e}")
+        pass
 
     def output(self) -> tuple[int, str]:
         if self.data:
@@ -29,8 +23,9 @@ class DataProcessor(ABC):
         else:
             raise IndexError("No data available")
 
+
 class NumericProcessor(DataProcessor):
-    def validate(self, data = Any) -> bool:
+    def validate(self, data: Any) -> bool:
         if isinstance(data, (int, float)) and not isinstance(data, bool):
             return True
 
@@ -39,15 +34,14 @@ class NumericProcessor(DataProcessor):
                 isinstance(item, (int, float)) and not isinstance(item, bool)
                 for item in data
             )
-        
+
         else:
             return False
 
-        
-    def ingest(self, data: int | float | list[int | float] ) -> None:
+    def ingest(self, data: int | float | list[int | float]) -> None:
         if not self.validate(data):
             raise TypeError("Improper numeric data")
-        
+
         if isinstance(data, list):
             for item in data:
                 self.data.append((self.rank, str(item)))
@@ -57,16 +51,14 @@ class NumericProcessor(DataProcessor):
             self.rank += 1
 
 
-    
-
 class TextProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         if isinstance(data, str):
             return True
-        
+
         if isinstance(data, list):
             return (all(isinstance(item, str) for item in data))
-        
+
         return False
 
     def ingest(self, data: str | list[str]) -> None:
@@ -80,23 +72,22 @@ class TextProcessor(DataProcessor):
         else:
             self.data.append((self.rank, str(data)))
             self.rank += 1
-            
 
 
 class LogProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         if isinstance(data, dict):
             return all(
-                isinstance(key, str) and isinstance(value, str) 
+                isinstance(key, str) and isinstance(value, str)
                 for key, value in data.items())
-        
+
         if isinstance(data, list):
             return all(
-                isinstance(item , dict)
+                isinstance(item, dict)
                 and all(
                     isinstance(key, str) and isinstance(value, str)
                     for key, value in item.items()
-                ) 
+                )
                 for item in data
             )
         return False
@@ -107,7 +98,7 @@ class LogProcessor(DataProcessor):
     ) -> None:
         if not self.validate(data):
             raise TypeError("Improper log data")
-        
+
         if isinstance(data, list):
             for item in data:
                 self.data.append((self.rank, str(item)))
@@ -115,7 +106,6 @@ class LogProcessor(DataProcessor):
         if isinstance(data, dict):
             self.data.append((self.rank, str(dict)))
             self.rank += 1
-        
 
 
 def main() -> None:
