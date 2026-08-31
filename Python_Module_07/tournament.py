@@ -1,9 +1,14 @@
-from ex0 import FlameFactory, AquaFactory
+from ex0 import FlameFactory, AquaFactory, CreatureFactory
 from ex1 import HealingCreatureFactory, TransformCreatureFactory
-from ex2 import NormalStrategy, AggressiveStrategy, DefensiveStrategy
+from ex2 import (
+    BattleStrategy,
+    NormalStrategy,
+    AggressiveStrategy,
+    DefensiveStrategy,
+)
 
 
-def battle(opponents):
+def battle(opponents: list[tuple[CreatureFactory, BattleStrategy]]) -> None:
     print("*** Tournament ***")
     print(f"{len(opponents)} opponents involved")
 
@@ -19,6 +24,7 @@ def battle(opponents):
             creature1 = factory1.create_base()
             creature2 = factory2.create_base()
 
+            print('\n')
             print("* Battle *")
             print(creature1.describe())
             print("vs.")
@@ -34,7 +40,7 @@ def battle(opponents):
                 return
 
 
-def main():
+def main() -> None:
     normal = NormalStrategy()
     aggressive = AggressiveStrategy()
     defensive = DefensiveStrategy()

@@ -1,16 +1,20 @@
 from abc import ABC, abstractmethod
 from ex0.creature import Creature
-from ex1.capability import Shiftling, Morphagon, Sproutling, Bloomelle
+from ex1.capability import (
+    TransformCapability,
+    HealCapability,
+)
+
 
 class BattleStrategy(ABC):
     @abstractmethod
     def act(self, creature: Creature) -> None:
         pass
 
-
     @abstractmethod
     def is_valid(self, creature: Creature) -> bool:
         pass
+
 
 class NormalStrategy(BattleStrategy):
     def act(self, creature: Creature) -> None:
@@ -20,10 +24,9 @@ class NormalStrategy(BattleStrategy):
             )
         print(creature.attack())
 
-
     def is_valid(self, creature: Creature) -> bool:
         return True
-    
+
 
 class AggressiveStrategy(BattleStrategy):
     def act(self, creature: Creature) -> None:
@@ -31,13 +34,14 @@ class AggressiveStrategy(BattleStrategy):
             raise TypeError(
                 f"Invalid Creature '{creature._name}' for Aggressive strategy"
             )
-        print(creature.transform())
-        print(creature.attack())
-        print(creature.revert())
 
+        if isinstance(creature, TransformCapability):
+            print(creature.transform())
+            print(creature.attack())
+            print(creature.revert())
 
     def is_valid(self, creature: Creature) -> bool:
-        return isinstance(creature, (Shiftling, Morphagon))
+        return isinstance(creature, TransformCapability)
 
 
 class DefensiveStrategy(BattleStrategy):
@@ -46,11 +50,9 @@ class DefensiveStrategy(BattleStrategy):
             raise TypeError(
                 f"Invalid Creature '{creature._name}' for Defensive strategy"
             )
-        
-        print(creature.attack())
-        print(creature.heal())
-
+        if isinstance(creature, HealCapability):
+            print(creature.attack())
+            print(creature.heal())
 
     def is_valid(self, creature: Creature) -> bool:
-        return isinstance(creature, (Sproutling, Bloomelle))
-
+        return isinstance(creature, HealCapability)
