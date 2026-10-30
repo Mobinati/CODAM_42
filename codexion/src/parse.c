@@ -1,8 +1,13 @@
+#include <stdlib.h>
+#include <string.h>
+#include "codexion.h"
 
-int isthere_string(str  *arg)
+int isthere_string(char  *arg)
 {
     int i;
 
+    if(!arg || !arg[0])
+        return(1);
     i = 0;
     while(arg[i])
     {
@@ -15,39 +20,46 @@ int isthere_string(str  *arg)
 
 int	parse_convert_str_to_int(char	*str)
 {
-	int	i;
 
-	i = 0;
 	if(!str)
-		return("ERROR: no args");
+		return(0);
     if(isthere_string(str) == 1)
-        return("ERROR: numeric arg has str in it");
+        return(0);
 	return(atoi(str));
 }
 
-int	parse_arguments(int	argc, char	**argv)
+int	parse_arguments(int argc, char **argv, t_config *config)
 {
-    t_config = []
+    int i;
+
 	if (argc != 9)
-		return("ERROR");
+		return(0);
     i = 1;
-    while(i<9)
+    while(i<8)
     {
         if(isthere_string(argv[i]) == 1)
-            return("ERROR: numeric arg is either negative or has str in it")
+            return(0);
+        i++;
     }
-	else
-	{
-		t_config[0] = atoi(argv[1]);
-		t_config[1] = atoi(argv[2]);
-		t_config[2] = atoi(argv[3]);
-        t_config[3] = atoi(argv[4]);
-        t_config[4] = atoi(argv[5]);
-        t_config[5] = atoi(argv[6]);
-        t_config[6] = atoi(argv[7]);
-        t_config[7] = atoi(argv[8]);
-        if (!(argv[8]) == "fifo" || argv[8] == "edf")
-            return("ERROR FOR SCHEDUELER (either fifo or edf)");
-        return(t_config);
-	}
+    if (strcmp(argv[8], "fifo") != 0 && strcmp(argv[8], "edf") != 0)
+        return(0);
+
+    config->number_of_coders = atoi(argv[1]);
+    config->time_to_burnout = atoi(argv[2]);
+    config->time_to_compile = atoi(argv[3]);
+    config->time_to_debug = atoi(argv[4]);
+    config->time_to_refactor = atoi(argv[5]);
+    config->number_of_compiles_required = atoi(argv[6]);
+    config->dongle_cooldown = atoi(argv[7]);
+    config->schedueler = argv[8];
+
+    if (config->number_of_coders <= 0
+        || config->time_to_burnout <= 0
+        || config->time_to_compile <= 0
+        || config->time_to_debug <= 0
+        || config->time_to_refactor <= 0
+        || config->number_of_compiles_required <= 0
+        || config->dongle_cooldown < 0)
+	    return (0);
+    return(1);
 }

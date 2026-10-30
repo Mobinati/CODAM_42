@@ -15,6 +15,7 @@ int	init_coders(t_simulation *simulation)
 		simulation->coders[i].id = i + 1;
 		simulation->coders[i].compile_count = 0;
 		simulation->coders[i].last_compile_start = 0;
+		simulation->coders[i].state = THINKING;
 		i++;
 	}
 	return(1);
