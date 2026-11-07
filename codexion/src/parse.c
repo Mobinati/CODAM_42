@@ -51,7 +51,7 @@ int	parse_arguments(int argc, char **argv, t_config *config)
     config->time_to_refactor = atoi(argv[5]);
     config->number_of_compiles_required = atoi(argv[6]);
     config->dongle_cooldown = atoi(argv[7]);
-    config->schedueler = argv[8];
+    config->scheduler = argv[8];
 
     if (config->number_of_coders <= 0
         || config->time_to_burnout <= 0

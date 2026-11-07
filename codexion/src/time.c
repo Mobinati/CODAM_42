@@ -13,9 +13,10 @@ long long	elapsed_ms(long long start_time)
 	return(get_time_ms() - start_time);
 }
 
-long long	sleep_ms(long long duration)
+void	sleep_ms(long long duration)
 {
-	usleep(duration * 1000); 
+	if (duration>0)
+		usleep(duration * 1000); 
 
 }
 
@@ -23,7 +24,7 @@ void	sleep_until(long long time)
 {
 	long long	remaining;
 
-	remaining = time - get_time_ms()
+	remaining = time - get_time_ms();
 	if (remaining > 0)
 		usleep(remaining * 1000);
 }
